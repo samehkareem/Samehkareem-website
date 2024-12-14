@@ -5,21 +5,25 @@ function CheckoutPage({ cartItems, clearCart }) {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
+    // Function to calculate the total price
+    const calculateTotal = () => {
+        return cartItems
+            .reduce((total, item) => total + parseFloat(item.price.replace(/[^0-9.]/g, '') || 0), 0)
+            .toFixed(2); // Ensure the total is formatted to two decimal places
+    };
+
     const handleCheckout = async () => {
         try {
-            const response = await fetch('http://localhost:3000/checkout', {
+            const response = await fetch('http://localhost:555/checkout', {
                 method: 'POST',
-                credentials: 'include', // Ensures cookies are sent with the request
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cartItems }), // Send cart items to the server
+                body: JSON.stringify({ cartItems }),
             });
 
-            console.log('Response status:', response.status); // Debugging info
             if (response.ok) {
                 setSuccess('Checkout successful! Thank you for your purchase.');
-                clearCart(); // Clear cart after successful checkout
-
-                // Redirect to home page after a delay
+                clearCart();
                 setTimeout(() => {
                     window.location.href = '/home';
                 }, 2000);
@@ -28,7 +32,6 @@ function CheckoutPage({ cartItems, clearCart }) {
                 setError(message || 'An error occurred during checkout.');
             }
         } catch (err) {
-            console.error('Network error:', err);
             setError('An error occurred during checkout.');
         }
     };
@@ -44,11 +47,16 @@ function CheckoutPage({ cartItems, clearCart }) {
                         <h3>Your Items</h3>
                         <ul>
                             {cartItems.map((item, index) => (
-                                <li key={index}>
-                                    {item.model} - {item.price}
+                                <li key={index} className="cart-item">
+                                    <img src={item.image} alt={item.name} className="cart-item-image" />
+                                    <div className="cart-item-details">
+                                        <strong className="cart-item-name">{item.name}</strong> - {item.price}
+                                        <p className="cart-item-description">{item.description}</p>
+                                    </div>
                                 </li>
                             ))}
                         </ul>
+                        <h4 className="cart-total">Total: ${calculateTotal()}</h4>
                     </div>
                     <div className="payment-section">
                         {error && <p className="error-message">{error}</p>}

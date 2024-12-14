@@ -62,7 +62,7 @@ server.post('/user/register', (req, res) => {
 
             db.run(
                 `INSERT INTO USER (NAME, EMAIL, PASSWORD, ISADMIN) VALUES (?, ?, ?, ?)`,
-                [name, email, hashedPassword, 0], // `0` this sign represents a non admin user
+                [name, email, hashedPassword, 0], // `0` represents a non-admin user
                 (err) => {
                     if (err) {
                         console.log('Error inserting user into DB:', err.message);
@@ -80,7 +80,7 @@ server.post('/user/register', (req, res) => {
 server.post('/clothing', (req, res) => {
     const { name, brand, price, description, quantity } = req.body;
 
-    // Check if all the required fields are provided
+    // Check if all required fields are provided
     if (!name || !brand || !price || !quantity) {
         return res.status(400).send('All fields except description are required.');
     }
@@ -109,43 +109,56 @@ server.get('/clothing', (req, res) => {
     });
 });
 
-// Checkout the API'S
+// Checkout Route
 server.post('/checkout', (req, res) => {
-    const { userID, cartItems } = req.body;
+    const { cartItems } = req.body;
 
-    if (!userID || !cartItems || cartItems.length === 0) {
-        return res.status(400).send('Invalid checkout request. User ID and cart items are required.');
+    if (!cartItems || cartItems.length === 0) {
+        return res.status(400).send('Cart is empty.');
     }
 
-    const query = `
-        INSERT INTO PURCHASES (USER_ID, CLOTHING_ID, QUANTITY)
-        VALUES (?, ?, ?)
-    `;
+    let outOfStockItems = [];
+    let processedItems = 0;
 
-    const dbOperations = cartItems.map(item => {
-        return new Promise((resolve, reject) => {
-            db.run(query, [userID, item.clothingID, item.quantity], (err) => {
+    cartItems.forEach((item) => {
+        db.get(
+            `SELECT QUANTITY FROM CLOTHING WHERE NAME = ?`,
+            [item.name],
+            (err, row) => {
                 if (err) {
-                    console.error('Error inserting purchase:', err);
-                    reject(err);
-                } else {
-                    resolve();
+                    console.error('Error fetching item quantity:', err);
+                    return res.status(500).send('Server error.');
                 }
-            });
-        });
+                if (!row || row.QUANTITY < item.quantity) {
+                    outOfStockItems.push(item.name);
+                } else {
+                    // Update stock in the database
+                    db.run(
+                        `UPDATE CLOTHING SET QUANTITY = QUANTITY - ? WHERE NAME = ?`,
+                        [item.quantity, item.name],
+                        (err) => {
+                            if (err) {
+                                console.error('Error updating stock:', err);
+                            }
+                        }
+                    );
+                }
+
+                processedItems++;
+                if (processedItems === cartItems.length) {
+                    if (outOfStockItems.length > 0) {
+                        return res
+                            .status(400)
+                            .send(
+                                `The following items are out of stock: ${outOfStockItems.join(', ')}`
+                            );
+                    }
+                    res.status(200).send('Checkout successful!');
+                }
+            }
+        );
     });
-
-    Promise.all(dbOperations)
-        .then(() => {
-            console.log('All purchases recorded successfully.');
-            res.status(200).send('Checkout successful!');
-        })
-        .catch(err => {
-            console.error('Error during checkout:', err);
-            res.status(500).send('Failed to complete the checkout.');
-        });
 });
-
 
 // Server Initialization
 server.listen(port, () => {

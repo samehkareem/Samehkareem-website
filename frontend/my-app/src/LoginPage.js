@@ -17,11 +17,11 @@ function LoginPage({ navigateTo, onLoginSuccess }) {
  
     try {
       const response = await axios.post('http://localhost:555/user/login', { email, password });
-      console.log('Login successful:', response.data); // Log the response for debugging
+      console.log('Login successful:', response.data); 
       onLoginSuccess(); // Notify App that login was successful
     } catch (error) {
       setErrorMessage(error.response ? error.response.data : 'Error logging in');
-      console.log('Error during login:', error); // Log the error for debugging
+      console.log('Error during login:', error); 
     }
   };
  
@@ -61,7 +61,7 @@ function LoginPage({ navigateTo, onLoginSuccess }) {
           <button
             onClick={(e) => {
               e.preventDefault();
-              navigateTo('SignUpPage'); // Switch to the SignUpPage
+              navigateTo('SignUpPage'); 
             }}
             className="link"
           >

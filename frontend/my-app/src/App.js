@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import Login from './LoginPage';
 import SignUpPage from './SignUpPage';
@@ -6,20 +6,13 @@ import Homepage from './homepage';
 import MenPage from './Men';
 import WomenPage from './women';
 import Cart from './Cart';
-import CheckoutPage from './CheckoutPage'; // Import the CheckoutPage component
+import CheckoutPage from './CheckoutPage';
+import NavBar from './NavBar'; // Import the NavBar component
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('LoginPage');  // Default to LoginPage
+  const [currentPage, setCurrentPage] = useState('LoginPage');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [cartItems, setCartItems] = useState([]); // State for cart items
-
-  useEffect(() => {
-    const userID = document.cookie.split('; ').find(row => row.startsWith('userID='));
-    if (userID) {
-      setIsAuthenticated(true);
-      setCurrentPage('homepage'); // Redirect to homepage if already logged in
-    }
-  }, []);  // Empty array ensures this runs only once when the component mounts
+  const [cartItems, setCartItems] = useState([]);
 
   const navigateTo = (page) => {
     setCurrentPage(page);
@@ -27,10 +20,11 @@ function App() {
 
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
-    setCurrentPage('homepage'); // Redirect to homepage after successful login
+    setCurrentPage('homepage');
   };
 
   const addToCart = (item) => {
+    // Add full product details to the cart
     setCartItems((prevItems) => [...prevItems, item]);
   };
 
@@ -43,7 +37,7 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className="app-wrapper">
       {currentPage === 'LoginPage' && (
         <Login navigateTo={navigateTo} onLoginSuccess={handleLoginSuccess} />
       )}
@@ -61,16 +55,10 @@ function App() {
       {currentPage === 'CheckoutPage' && (
         <CheckoutPage cartItems={cartItems} clearCart={clearCart} />
       )}
+
+      {/* Render NavBar for all pages except Login and Register */}
       {currentPage !== 'LoginPage' && currentPage !== 'SignUpPage' && (
-        <nav className="nav">
-          <button onClick={() => navigateTo('homepage')}>Home</button>
-          <button onClick={() => navigateTo('LoginPage')}>Login</button>
-          <button onClick={() => navigateTo('SignUpPage')}>Register</button>
-          <button onClick={() => navigateTo('MenPage')}>Men's Clothing</button>
-          <button onClick={() => navigateTo('WomenPage')}>Women's Clothing</button>
-          <button onClick={() => navigateTo('Cart')}>Cart</button>
-          <button onClick={() => navigateTo('CheckoutPage')}>Checkout</button>
-        </nav>
+        <NavBar navigateTo={navigateTo} />
       )}
     </div>
   );

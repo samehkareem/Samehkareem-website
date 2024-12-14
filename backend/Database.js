@@ -1,5 +1,5 @@
 const sqlite = require('sqlite3');
-const db = new sqlite.Database('PureStitch.db'); 
+const db = new sqlite.Database('PureStitch.db'); // Path to your SQLite database
 
 // Create USER table
 const createUserTable = `

@@ -75,7 +75,7 @@ function SignUp({ navigateTo }) {
         <button
           onClick={(e) => {
             e.preventDefault();
-            navigateTo('login'); // Switch to the login page
+            navigateTo('login'); 
           }}
           className="link"
         >

@@ -1,44 +1,122 @@
+/* Reset defaults for better control */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Main checkout container */
 .checkout-container {
     padding: 20px;
-    max-width: 600px;
+    max-width: 100%;
+    width: 600px; /* Restrict to 600px or less */
     margin: auto;
     font-family: Arial, sans-serif;
+    text-align: center;
 }
- 
+
+/* Cart summary container */
 .cart-summary {
     margin-bottom: 20px;
+    text-align: left; /* Align items to the left for readability */
 }
- 
+
+/* Individual cart items */
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+/* Cart item image styling */
+.cart-item-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 15px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Cart item details */
+.cart-item-details {
+    flex: 1;
+    text-align: left;
+}
+
+.cart-item-name {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.cart-item-description {
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Total price styling */
+.cart-total {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+/* Payment section */
 .payment-section {
     margin-top: 20px;
 }
- 
-input {
-    margin-left: 10px;
-    padding: 5px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
- 
+
 button.checkout-btn {
-    background-color: #4c90af;
+    background-color: #07090a;
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    width: 100%; /* Make the button responsive */
 }
- 
+
 button.checkout-btn:hover {
     background-color: #2b3f97;
 }
- 
+
+/* Error and success messages */
 .error-message {
     color: red;
     margin-top: 10px;
 }
- 
+
 .success-message {
     color: green;
     margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .checkout-container {
+        padding: 10px;
+        width: 100%; /* Full width for smaller screens */
+    }
+
+    .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cart-item-image {
+        margin-bottom: 10px;
+    }
+
+    .cart-item-details {
+        text-align: left;
+    }
+
+    button.checkout-btn {
+        width: 100%;
+        padding: 15px;
+    }
 }
